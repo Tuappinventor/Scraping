@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel='shortcut icon' type='image/x-icon' href='/assets/favicon.ico' />
+
+    <title>Lesiones Liga BBVA</title>
+
+    <link href="bs/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="app.js"></script>
+
+    <style>
+      .navbar-brand-CENTER
+      {
+          position: absolute;
+          width: 100%;
+          left: 0;
+          text-align: center;
+          margin: auto;
+      }
+
+      td { white-space:pre }
+
+      h1 {
+         -webkit-text-stroke: 1px black;
+         color: white;
+         text-shadow:
+             2px 2px 0 #000,
+           -1px -1px 0 #000,  
+            1px -1px 0 #000,
+            -1px 1px 0 #000,
+             1px 1px 0 #000;
+      }
+
+      canvas {
+          padding-left: 0;
+          padding-right: 0;
+          margin-left: auto;
+          margin-right: auto;
+          display: block;
+      }
+    </style>
+
+  </head>
+
+  <body role="document">
+    <nav class="navbar navbar-default" role="navigation" style="min-height: 75px; margin-bottom: 1px; !important">
+          <h1 class="navbar-brand-CENTER" style="margin-top: 15px; !important" href="#"><stroke>Lesiones Liga BBVA</stroke></h1>
+    </nav>
+
+    <div class="container" role="main">
+      <div class="page-header" style="margin:10px" >
+        <h2><a href="http://www.goal.com/es/news/27/liga-de-espa%C3%B1a/2015/12/30/4730098/sancionados-lesionados-y-apercibidos" target="_blank"><stroke>Jornada 31</stroke></a></h2>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <canvas id="countries" max-width="650" height="400"></canvas>
+        </div>
+        <div class="col-md-6">
+          <div id="tableInjuries" style="overflow: scroll;height: 400px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="bs/js/bootstrap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
+
+  </body>
+</html>
