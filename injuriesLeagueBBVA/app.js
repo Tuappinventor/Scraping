@@ -1,59 +1,100 @@
-var data = {};
-var sortable = [];
-var csv_as_array = [];
-var pie_data = [];
+
+var dataLeague = [ 
+  {   
+    url: "https://raw.githubusercontent.com/Xatpy/Scraping/master/injuriesLeagueBBVA/J31.csv", 
+    chart:"chart_j31", table:"tableInjuries_j31"  , 
+    dataCSV:{} , sortable : [] , pie_data : [] 
+  },
+  { 
+    url: "https://raw.githubusercontent.com/Xatpy/Scraping/master/injuriesLeagueBBVA/data/J32.csv", 
+    chart:"chart_j32", table:"tableInjuries_j32"  , 
+    dataCSV:{} , sortable : [] , pie_data : [] 
+  },
+];
 
 window.onload = function() {
-  loadCSV();
+  debugger
+  for (var i = 0; i < dataLeague.length; ++i) {
+    loadCSV(  dataLeague[i].url, dataLeague[i].chart, dataLeague[i].table, 
+              dataLeague[i].dataCSV, dataLeague[i].sortable, dataLeague[i].pie_data );
+  }
 };
 
-function createRandomColor() {
-  return '#'+(0x1000000+(Math.random())*0xffffff).toString(16).substr(1,6);
-}
-
-function addRecord(player, injury){
-  if ( (data[injury] === undefined) || (data[injury] === null) ){
-    data[injury] = [];                
-  }
-  data[injury].push(player);
-}
-
-function orderList(){
-  for (var key in data){
-    sortable.push([key, data[key]])
-  }
-  sortable.sort(function(a, b) {
-    if (a[1].length === b[1].length){
-      if(a[0] < b[0]) return -1;
-      if(a[0] > b[0]) return 1;
-    } else
-      return b[1].length - a[1].length;
-  });
-}
-
-function loadCSV() {
+function loadCSV(csv_url, chart, tableElement, dataCSV, sortable, pie_data) {
     $.ajax({
-      url: "https://raw.githubusercontent.com/Xatpy/Scraping/master/injuriesLeagueBBVA/J31.csv",
+      url: csv_url,
+      csv_as_array : [],
       aync: false,
       success: function (csvd) {
           csv_as_array = $.csv2Array(csvd);
       }, 
       dataType: "text",
       complete: function () {
+
         for (var contCsv = 1; contCsv < csv_as_array.length; ++contCsv) {
-          addRecord(csv_as_array[contCsv][0], csv_as_array[contCsv][1]);
+          addRecord(csv_as_array[contCsv][0], csv_as_array[contCsv][1], dataCSV);
         }
 
-        orderList();   
+        orderList(dataCSV, sortable);   
 
-        fillPieChart();
+        fillPieChart(chart, sortable, pie_data);
 
-        fillTable();                 
+        fillTable(tableElement, sortable, pie_data);                 
       }
     });
 };
 
-function fillTable(){
+function addRecord(player, injury, dataCSV){
+  if ( (dataCSV[injury] === undefined) || (dataCSV[injury] === null) ){
+    dataCSV[injury] = [];                
+  }
+  dataCSV[injury].push(player);
+}
+
+function orderList(dataCSV, sortable){
+  for (var key in dataCSV){
+    sortable.push([key, dataCSV[key]])
+  }
+  sortable.sort(function(a, b) {
+    if (a[1].length === b[1].length){
+      if(a[0] < b[0]) 
+        return -1;
+      if(a[0] > b[0]) 
+        return 1;
+    } else
+      return b[1].length - a[1].length;
+  });
+}
+
+function fillPieChart(chart, sortable, pie_data){
+  for (var i = 0; i < sortable.length; ++i){
+    pie_data[i] = {
+        color : createRandomColor(),
+        value : sortable[i][1].length,
+        label : sortable[i][0]
+      }
+  };
+
+  createPieChar(chart, pie_data);
+}
+
+function createPieChar(chart, pie_data){
+  // pie chart options
+  var pieOptions = {
+       segmentShowStroke : false,
+       animateScale : true,
+  }
+  // get pie chart canvas
+  var countries= document.getElementById(chart).getContext("2d");
+  // draw pie chart
+  var chart = new Chart(countries).Pie(pie_data, pieOptions);
+}
+
+function createRandomColor() {
+  return '#'+(0x1000000+(Math.random())*0xffffff).toString(16).substr(1,6);
+}
+
+function fillTable(tableElement, sortable, pie_data){
   var table = document.createElement('table');
   table.className = "table";
   var thead = document.createElement('thead');
@@ -102,29 +143,5 @@ function fillTable(){
   }
   table.appendChild(tbody);
 
-  document.getElementById("tableInjuries").appendChild(table);
-}
-
-function fillPieChart(){
-  for (var i = 0; i < sortable.length; ++i){
-    pie_data[i] = {
-        color : createRandomColor(),
-        value : sortable[i][1].length,
-        label : sortable[i][0]
-      }
-  };
-
-  createPieChar();
-}
-
-function createPieChar(){
-  // pie chart options
-  var pieOptions = {
-       segmentShowStroke : false,
-       animateScale : true,
-  }
-  // get pie chart canvas
-  var countries= document.getElementById("countries").getContext("2d");
-  // draw pie chart
-  var chart = new Chart(countries).Pie(pie_data, pieOptions);
+  document.getElementById(tableElement).appendChild(table);
 }
