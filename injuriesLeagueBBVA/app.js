@@ -1,7 +1,7 @@
 
 var dataLeague = [ 
   {   
-    url: "https://raw.githubusercontent.com/Xatpy/Scraping/master/injuriesLeagueBBVA/J31.csv", 
+    url: "https://raw.githubusercontent.com/Xatpy/Scraping/master/injuriesLeagueBBVA/data/J31.csv", 
     chart:"chart_j31", table:"tableInjuries_j31"  , 
     dataCSV:{} , sortable : [] , pie_data : [] 
   },
