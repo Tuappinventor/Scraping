@@ -1,29 +1,110 @@
 
 var dataLeague = [ 
   {   
-    url: "https://raw.githubusercontent.com/Xatpy/Scraping/master/injuriesLeagueBBVA/J31.csv", 
+    url: "https://raw.githubusercontent.com/Xatpy/Scraping/master/injuriesLeagueBBVA/data/J31.csv", 
     chart:"chart_j31", table:"tableInjuries_j31"  , 
-    dataCSV:{} , sortable : [] , pie_data : [] 
+    dataCSV:{} , sortable : [] , pie_data : [] , num : 31 ,
   },
   { 
     url: "https://raw.githubusercontent.com/Xatpy/Scraping/master/injuriesLeagueBBVA/data/J32.csv", 
     chart:"chart_j32", table:"tableInjuries_j32"  , 
-    dataCSV:{} , sortable : [] , pie_data : [] 
+    dataCSV:{} , sortable : [] , pie_data : [] , num : 32 ,
   },
   { 
     url: "https://raw.githubusercontent.com/Xatpy/Scraping/master/injuriesLeagueBBVA/data/J33.csv", 
     chart:"chart_j33", table:"tableInjuries_j33"  , 
-    dataCSV:{} , sortable : [] , pie_data : [] 
+    dataCSV:{} , sortable : [] , pie_data : [] , num : 33 ,
+  },
+  { 
+    url: "https://raw.githubusercontent.com/Xatpy/Scraping/master/injuriesLeagueBBVA/data/J34.csv", 
+    chart:"chart_j34", table:"tableInjuries_j34"  , 
+    dataCSV:{} , sortable : [] , pie_data : [] , num : 34 ,
   },
 ];
 
 window.onload = function() {
-  debugger
+  createDivs();
+
   for (var i = 0; i < dataLeague.length; ++i) {
     loadCSV(  dataLeague[i].url, dataLeague[i].chart, dataLeague[i].table, 
-              dataLeague[i].dataCSV, dataLeague[i].sortable, dataLeague[i].pie_data );
+            dataLeague[i].dataCSV, dataLeague[i].sortable, dataLeague[i].pie_data );
   }
 };
+
+/* :== TEMPLATE ==:
+    <div class="page-header" style="margin:10px" >
+      <h2><a href="http://www.goal.com/es/news/27/liga-de-espa%C3%B1a/2015/12/30/4730098/sancionados-lesionados-y-apercibidos" target="_blank"><stroke>Jornada 31</stroke></a></h2>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <canvas id="chart_j31" max-width="650" height="400"></canvas>
+      </div>
+      <div class="col-md-6">
+        <div id="tableInjuries_j31" style="overflow: scroll;height: 400px;"></div>
+      </div>
+    </div>
+*/
+function createDivs() {
+  debugger
+  var mainDiv = document.getElementById("mainContainer");
+
+  for (var i = dataLeague.length - 1 ; i >= 0; --i) {
+    debugger
+    var divJornada = document.createElement("div");
+    divJornada.appendChild(createHeaderDiv(i));
+    divJornada.appendChild(createContentDiv(i));
+
+    mainDiv.appendChild(divJornada);
+  }
+}
+
+function createContentDiv(i) {
+  debugger
+  var divRow = document.createElement("div");
+  divRow.className = "row";
+
+  // Create char Canvas
+  var divChar = document.createElement("div");
+  divChar.className = "col-md-6";
+  var canvas = document.createElement("canvas");
+  canvas.id = dataLeague[i].chart;
+  canvas.style.maxWidth = "600px";
+  canvas.style.height = "400px";
+  divChar.appendChild(canvas);
+
+  var divColTable = document.createElement("div");
+  divColTable.class = "col-md-6";
+  var divTable = document.createElement("div");
+  divTable.id = dataLeague[i].table;
+  divTable.style.overflow = "scroll";
+  divTable.style.height = "400px";
+
+  divColTable.appendChild(divTable);
+
+  divRow.appendChild(divChar);
+  divRow.appendChild(divColTable);
+
+  return divRow;
+}
+
+function createHeaderDiv(i) {
+    var div = document.createElement("div");
+    div.className = "page-header";
+    div.style.margin = "10px";
+    
+    var a = document.createElement('a');
+    var title = "Jornada " + dataLeague[i].num;
+    var linkText = document.createTextNode(title);
+    a.appendChild(linkText);
+    a.title = title;
+    a.href = "http://www.goal.com/es/news/27/liga-de-espa%C3%B1a/2015/12/30/4730098/sancionados-lesionados-y-apercibidos";
+
+    var h2 = document.createElement('h2');
+
+    h2.appendChild(a);
+    div.appendChild(h2);
+    return div;
+}
 
 function loadCSV(csv_url, chart, tableElement, dataCSV, sortable, pie_data) {
     $.ajax({
