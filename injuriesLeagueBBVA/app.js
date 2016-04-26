@@ -25,6 +25,11 @@ var dataLeague = [
     chart:"chart_j35", table:"tableInjuries_j35"  , 
     dataCSV:{} , sortable : [] , pie_data : [] , num : 35 ,
   },
+  { 
+    url: "https://raw.githubusercontent.com/Xatpy/Scraping/master/injuriesLeagueBBVA/data/J36.csv", 
+    chart:"chart_j36", table:"tableInjuries_j36"  , 
+    dataCSV:{} , sortable : [] , pie_data : [] , num : 36 ,
+  },
 ];
 
 window.onload = function() {
