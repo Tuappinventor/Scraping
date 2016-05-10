@@ -2,6 +2,10 @@ from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 import time
 from PIL import Image
+from PIL import ImageFont
+from PIL import ImageDraw 
+
+import os
 import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -49,6 +53,17 @@ def getMatches():
 
     driver.quit()
 
+def addOverlayImage(file):
+    textFile = os.path.basename(file)
+    text = textFile[textFile.index('_') + 1:]
+    text = text.replace(".png", "")
+
+    img = Image.open(file)
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.truetype("TektonPro-BoldExt.ttf", 18)
+    draw.text((70, 0), text, (0,0,0), font=font)
+    img.save(textFile + '.jpg')
+
 def saveScreenshot(element, namePNG, driver):
     location = element.location
     size = element.size
@@ -64,6 +79,8 @@ def saveScreenshot(element, namePNG, driver):
 
     im = im.crop((left, top, right, bottom)) # defines crop points
     im.save(namePNG) # saves new cropped image
+
+    addOverlayImage(namePNG)
 
 def getMatchInfo(match, current_match, raw):
     time.sleep(1)
@@ -130,5 +147,3 @@ if __name__ == "__main__":
         getMatchInfo(match, current_match, raw)
         i += 1
     print "end"
-
-
