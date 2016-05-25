@@ -21,7 +21,7 @@ def isLocalTeam(match):
     defaultTeam = None
     if (team_name == "real-madrid"):
         defaultTeam = "R. Madrid"
-    elif (team_name == ""):
+    elif (team_name == "atletico"):
         defaultTeam = u'Atl\xe9tico'
     teamsArr = match.split("-")
     return True if (teamsArr[0] == defaultTeam) else False
@@ -39,7 +39,7 @@ def getMatches(team_name):
     table_id = driver.find_element_by_id('resultadosCompletos');
     rows = table_id.find_elements_by_tag_name("tr") # get all of the rows in the table
     for row in rows:
-        # Get the columns (all the column 2)ç
+        # Get the columns (all the column 2)
         if row.get_attribute("class") == "encabezado":
             continue
 
