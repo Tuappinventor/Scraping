@@ -17,17 +17,18 @@ class Match:
   local = True
   link = ''
 
-
 def isLocalTeam(teams):
     defaultTeam = u'Atl\xe9tico'
     teamsArr = teams.split("-")
     return True if (teamsArr[0] == defaultTeam) else False
 
-def getMatches():
+def getMatches(team_name):
     driver.implicitly_wait(5)
     driver.set_page_load_timeout(11)
     
-    url = "http://www.marca.com/deporte/futbol/equipos/atletico/resultados-temporada.html"
+    #url = "http://www.marca.com/deporte/futbol/equipos/atletico/resultados-temporada.html"
+    #url = "http://www.marca.com/deporte/futbol/equipos/real-madrid/resultados-temporada.html
+    url = "http://www.marca.com/deporte/futbol/equipos/" + team_name + "/resultados-temporada.html"
     try:
         driver.get(url)
     except:
@@ -60,9 +61,14 @@ def addOverlayImage(file):
 
     img = Image.open(file)
     draw = ImageDraw.Draw(img)
-    font = ImageFont.truetype("TektonPro-BoldExt.ttf", 18)
+    font = ImageFont.truetype("TektonPro-BoldExt.otf", 18)
     draw.text((70, 0), text, (0,0,0), font=font)
-    img.save(textFile + '.jpg')
+
+    #size = 128, 128
+    #img.thumbnail(size)
+    #img.save(textFile + ".thumbnail", "JPEG")
+
+    img.save(file)
 
 def saveScreenshot(element, namePNG, driver):
     location = element.location
@@ -82,53 +88,65 @@ def saveScreenshot(element, namePNG, driver):
 
     addOverlayImage(namePNG)
 
-def getMatchInfo(match, current_match, raw):
-    time.sleep(1)
+def getMatchInfo(match, current_match, team_name):
+    #if not driver:
+        #driver.quit()
+    driver = None
+    time.sleep(10)
 
     driver = webdriver.Firefox()
     driver.set_window_position(0,0)
-    driver.delete_all_cookies()
+    #driver.delete_all_cookies()
 
     #url = "http://www.marca.com/eventos/marcador/futbol/2015_16/champions/semifinal/ida/atm_bay/"
     driver.get(match.link)
 
     time.sleep(10)
 
-    if driver.find_element_by_xpath("//*[contains(text(), 'O. INICIALES')]"):
-        oncesIniciales = driver.find_element_by_xpath("//*[contains(text(), 'O. INICIALES')]");
+    raw = ""
 
-        if oncesIniciales:
-            oncesIniciales.click()
-            print "clicked onces iniciales"
+    try:
+        if driver.find_element_by_xpath("//*[contains(text(), 'O. INICIALES')]"):
+            oncesIniciales = driver.find_elements_by_xpath("//*[contains(text(), 'O. INICIALES')]");
 
-            raw += match.teams + ","
+            if len(oncesIniciales) > 0:
+                oncesIniciales[0].click()
 
-            # Local team = lTeamAlign
-            # Visitant team = vTeamAlign
-            teamElement = "lTeamAlign" if (match.local) else "vTeamAlign"
-            #atletiElem = driver.find_element_by_class_name("lTeamAlign");
-            atletiElem = driver.find_elements_by_class_name("green")[0].find_element_by_class_name("iniciales").find_element_by_class_name(teamElement)
+                raw += match.teams + ","
 
-            alignmentText = None
-            alineacionElem = "alignment" if (match.local) else "vAlignment"
-            if atletiElem.find_element_by_class_name(alineacionElem):
-                alignment = atletiElem.find_element_by_class_name(alineacionElem).text
-                raw += alignment + ","
+                # Local team = lTeamAlign
+                teamElement = "lTeamAlign" if (match.local) else "vTeamAlign"
+                teamElement = driver.find_elements_by_class_name("green")[0].find_element_by_class_name("iniciales").find_element_by_class_name(teamElement)
 
-            lines = atletiElem.find_elements_by_class_name("plLine");
-            for line in lines:
-                players = line.find_elements_by_class_name("player");
-                for player in players:
-                    name = player.find_element_by_class_name("pl-name").text.encode("utf-8");
-                    #print name
-                    raw += name.encode('utf-8') + "\t"
+                alignmentText = None
+                alineacionElem = "alignment" if (match.local) else "vAlignment"
+                if teamElement.find_element_by_class_name(alineacionElem):
+                    alignment = teamElement.find_element_by_class_name(alineacionElem).text
+                    raw += alignment + ","
 
-            raw += "\n"
-            saveScreenshot(atletiElem, str(current_match) + "_" + match.teams + ".png", driver);
+                lines = teamElement.find_elements_by_class_name("plLine");
+                for line in lines:
+                    players = line.find_elements_by_class_name("player");
+                    for player in players:
+                        name = player.find_element_by_class_name("pl-name").text.encode("utf-8");
+                        raw += name.encode('utf-8') + "\t"
 
-            print raw
+                raw += "\n"
+                #saveScreenshot(teamElement, "Atleti/" + str(current_match) + "_" + match.teams + ".png", driver);
+                if not os.path.exists(team_name):
+                    os.makedirs(team_name)
+                saveScreenshot(teamElement, team_name + "/" + str(current_match) + "_" + match.teams + ".png", driver);
 
-    #driver.quit()
+    except:
+        print "Element not found. Continue..."
+        driver.quit()
+
+    return raw
+
+
+def writeFileResults(nameFile, raw):
+    with open(nameFile, 'w+') as fResults:
+        fResults.write(raw.encode('utf8'))
 
 
 if __name__ == "__main__":
@@ -136,14 +154,21 @@ if __name__ == "__main__":
     driver = webdriver.Firefox()
     driver.maximize_window()
     driver.delete_all_cookies()
-
+    
     raw = ""
 
     listMatches = []
-    getMatches()
+    #team_name = "atletico"
+    team_name = "real-madrid"
+    getMatches(team_name)
     i = 1
     for match in listMatches:
         current_match = len(listMatches) - i
-        getMatchInfo(match, current_match, raw)
+        raw += getMatchInfo(match, current_match, team_name)
         i += 1
-    print "end"
+
+    writeFileResults('atleti.csv', raw)
+
+    driver.quit()
+
+    print "- end -"
