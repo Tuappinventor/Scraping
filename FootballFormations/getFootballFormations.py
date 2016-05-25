@@ -15,19 +15,21 @@ class Match:
   competition = ''
   teams = ''
   local = True
-  link = ''
+  link = ''         #exampleUrl = "http://www.marca.com/eventos/marcador/futbol/2015_16/champions/semifinal/ida/atm_bay/"
 
-def isLocalTeam(teams):
-    defaultTeam = u'Atl\xe9tico'
-    teamsArr = teams.split("-")
+def isLocalTeam(match):
+    defaultTeam = None
+    if (team_name == "real-madrid"):
+        defaultTeam = "R. Madrid"
+    elif (team_name == ""):
+        defaultTeam = u'Atl\xe9tico'
+    teamsArr = match.split("-")
     return True if (teamsArr[0] == defaultTeam) else False
 
 def getMatches(team_name):
     driver.implicitly_wait(5)
     driver.set_page_load_timeout(11)
     
-    #url = "http://www.marca.com/deporte/futbol/equipos/atletico/resultados-temporada.html"
-    #url = "http://www.marca.com/deporte/futbol/equipos/real-madrid/resultados-temporada.html
     url = "http://www.marca.com/deporte/futbol/equipos/" + team_name + "/resultados-temporada.html"
     try:
         driver.get(url)
@@ -37,7 +39,7 @@ def getMatches(team_name):
     table_id = driver.find_element_by_id('resultadosCompletos');
     rows = table_id.find_elements_by_tag_name("tr") # get all of the rows in the table
     for row in rows:
-        # Get the columns (all the column 2)
+        # Get the columns (all the column 2)ç
         if row.get_attribute("class") == "encabezado":
             continue
 
@@ -61,12 +63,8 @@ def addOverlayImage(file):
 
     img = Image.open(file)
     draw = ImageDraw.Draw(img)
-    font = ImageFont.truetype("TektonPro-BoldExt.otf", 18)
+    font = ImageFont.truetype(fontFile, 18)
     draw.text((70, 0), text, (0,0,0), font=font)
-
-    #size = 128, 128
-    #img.thumbnail(size)
-    #img.save(textFile + ".thumbnail", "JPEG")
 
     img.save(file)
 
@@ -89,16 +87,12 @@ def saveScreenshot(element, namePNG, driver):
     addOverlayImage(namePNG)
 
 def getMatchInfo(match, current_match, team_name):
-    #if not driver:
-        #driver.quit()
     driver = None
     time.sleep(10)
 
     driver = webdriver.Firefox()
     driver.set_window_position(0,0)
-    #driver.delete_all_cookies()
 
-    #url = "http://www.marca.com/eventos/marcador/futbol/2015_16/champions/semifinal/ida/atm_bay/"
     driver.get(match.link)
 
     time.sleep(10)
@@ -114,7 +108,6 @@ def getMatchInfo(match, current_match, team_name):
 
                 raw += match.teams + ","
 
-                # Local team = lTeamAlign
                 teamElement = "lTeamAlign" if (match.local) else "vTeamAlign"
                 teamElement = driver.find_elements_by_class_name("green")[0].find_element_by_class_name("iniciales").find_element_by_class_name(teamElement)
 
@@ -132,7 +125,7 @@ def getMatchInfo(match, current_match, team_name):
                         raw += name.encode('utf-8') + "\t"
 
                 raw += "\n"
-                #saveScreenshot(teamElement, "Atleti/" + str(current_match) + "_" + match.teams + ".png", driver);
+
                 if not os.path.exists(team_name):
                     os.makedirs(team_name)
                 saveScreenshot(teamElement, team_name + "/" + str(current_match) + "_" + match.teams + ".png", driver);
@@ -150,25 +143,28 @@ def writeFileResults(nameFile, raw):
 
 
 if __name__ == "__main__":
-
+    # ::: Globals :::
     driver = webdriver.Firefox()
     driver.maximize_window()
     driver.delete_all_cookies()
     
+    fontFile = "verdana.ttf"
     raw = ""
-
     listMatches = []
-    #team_name = "atletico"
-    team_name = "real-madrid"
-    getMatches(team_name)
-    i = 1
-    for match in listMatches:
-        current_match = len(listMatches) - i
-        raw += getMatchInfo(match, current_match, team_name)
-        i += 1
 
-    writeFileResults('atleti.csv', raw)
+    # ::: Teams :::
+    team_name = "atletico"
+    #team_name = "real-madrid"
+    
+    getMatches(team_name)
+    count = 1
+    for match in listMatches:
+        current_match = len(listMatches) - count
+        raw += getMatchInfo(match, current_match, team_name)
+        count += 1
+
+    writeFileResults(team_name + '.csv', raw)
 
     driver.quit()
 
-    print "- end -"
+    print "# end script."
