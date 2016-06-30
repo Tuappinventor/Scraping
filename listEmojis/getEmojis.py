@@ -12,12 +12,14 @@ if __name__ == "__main__":
     driver.get(url)
 
     codes = driver.find_elements_by_class_name("code")
+
     if codes:
         numTimes = 200
         raw = "["
         for code in codes:
-            # "&#x"
-            raw += '"' + code.text.replace("U+","x") + '",'
+            separatedUnicodes = code.text.split(" ")
+            for unic in separatedUnicodes:
+                raw += '"' + unic.replace("U+","x") + '",'
         raw = raw[:-1]
         raw += "]"
 
