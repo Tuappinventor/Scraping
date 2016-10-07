@@ -5,6 +5,7 @@
 	<style>
 		body {
 			text-align: center;
+			background-color: #d8d8d8;
 		}
 		body > div {
 			display: flex;
@@ -18,6 +19,14 @@
 			width: 33%;
 			height: 100px;
 		}
+
+		img {
+			max-width:275px; 
+			max-height: 275px;
+		}
+		.resultsDiv {
+			padding-top: 20px;
+		}
 	</style>
 </head>
 <body>
@@ -27,10 +36,11 @@
 	  <input type="url" name="photoURL" value="http://ep01.epimg.net/deportes/imagenes/2016/08/28/actualidad/1472413232_722531_1472414050_miniatura_normal.jpg" id="photoURL"><br>
 	</form>
 	<button>SEND</button>
-
+	<h1>Image to compare</h1>
 	<div id="compareImg">
-		<img id="imgCompare" style="max-width:275px; max-height: 275px"></img>
+		<img id="imgCompare" style=></img>
 	</div>
+	<h2>Results</h2>
 	<div id="resultsDiv">
 		<div id="result0">
 			<img id="resultPhoto0"></img>
@@ -51,7 +61,20 @@
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 	<script>
+	function fillWithPlaceholders() {
+		debugger
+		var placeholderURL = "http://www.foo.com.tr/foo.png";
+		for (var i = 0; i < 3; ++i) {
+    		document.getElementById("resultPhoto" + (i)).src = placeholderURL;
+    		document.getElementById("resultName" + (i)).innerText = "foo";
+    	}
+    	// Photo to compare
+		document.getElementById("imgCompare").src = placeholderURL;
+	}
+
 	$(document).ready(function(){
+		fillWithPlaceholders();
+
 	    $("button").click(function(){
 	    	var urlData = "https://znrd2tniy1.execute-api.us-west-2.amazonaws.com/prod/getPlayers";
 	    	var photoURL = document.getElementById("photoURL").value;
