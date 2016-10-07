@@ -3,11 +3,16 @@
 
 import csv
 import cognitive_face as CF
+import json
 
 class PlayerInfo(object):
     name = ""
     photoUrl = ""
     faceId = ""
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, 
+            sort_keys=True, indent=4)
 
 def loadPlayersInfo(playersInfoList, file):
     with open(file, 'rb') as csvReadFile:
@@ -48,6 +53,7 @@ def getComparationFaces(urlFace, faceListId, playersInfoList):
         print "No faces in the list"
         return
 
+    resultObj = "["
     cont = 0
     for cont in range(3):
         faceId = str(ret[cont][u'persistedFaceId'])
@@ -55,20 +61,29 @@ def getComparationFaces(urlFace, faceListId, playersInfoList):
         player = getPlayerNameByFaceId(playersInfoList, faceId)
         if player == None:
             return
-        print "#" + str((cont + 1)) + ") " + str(player.name) + " --- " + confidence + " --- " + player.photoUrl
+        #print "#" + str((cont + 1)) + ") " + str(player.name) + " --- " + confidence + " --- " + player.photoUrl
+        resultObj += player.toJSON() + ","
+    resultObj = resultObj[:-1]
+    resultObj += "]"
+    resultObj = resultObj.replace("\n","")
+    resultObj = resultObj.replace("\"",'"')
+    return resultObj
 
 # ---MAIN---
 
-KEY = 'YOUR_KEY'
-CF.Key.set(KEY)
+def lambda_handler(event, context):
+    KEY = 'your_key'
+    CF.Key.set(KEY)
 
-idList = 2
-#createFaceList(idList)
+    idList = 2
+    #createFaceList(idList)
 
-file = "atletiCarasOut.csv"
-playersInfoList = []
-loadPlayersInfo(playersInfoList, file)
+    file = "atletiCarasOut.csv"
+    playersInfoList = []
+    loadPlayersInfo(playersInfoList, file)
 
-urlFace = "http://img.estaticos-atleticodemadrid.com/system/fotos/603/showlarge/moya_web.jpg?1413539984"
-getComparationFaces(urlFace, idList, playersInfoList)
+    urlFace = "http://img.estaticos-atleticodemadrid.com/system/fotos/603/showlarge/moya_web.jpg?1413539984"
+    resultObj = getComparationFaces(event.key1, idList, playersInfoList)
+    return resultObj
 
+#lambda_handler("","")

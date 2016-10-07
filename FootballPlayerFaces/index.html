@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Face compare</title>
+	<style>
+		body {
+			text-align: center;
+		}
+		body > div {
+			display: flex;
+			flex-wrap: wrap;
+			width: 100%;
+		    align-items: center;
+    		justify-content: center;
+		}
+		body > div > div {
+			flex-grow: 1;
+			width: 33%;
+			height: 100px;
+		}
+	</style>
+</head>
+<body>
+	<h1>Compare faces</h1>
+	<form>
+	  Photo URL to compare:<br>
+	  <input type="url" name="photoURL" value="http://ep01.epimg.net/deportes/imagenes/2016/08/28/actualidad/1472413232_722531_1472414050_miniatura_normal.jpg" id="photoURL"><br>
+	</form>
+	<button>SEND</button>
+
+	<div id="compareImg">
+		<img id="imgCompare" style="max-width:275px; max-height: 275px"></img>
+	</div>
+	<div id="resultsDiv">
+		<div id="result0">
+			<img id="resultPhoto0"></img>
+			<h3 id="resultName0"></h3>
+			<h4 id="confidence0"></h4>
+		</div>
+		<div id="result1">
+			<img id="resultPhoto1"></img>
+			<h3 id="resultName1"></h3>
+			<h4 id="confidence1"></h4>
+		</div>
+		<div id="result2">
+			<img id="resultPhoto2"></img>
+			<h3 id="resultName2"></h3>
+			<h4 id="confidence2"></h4>
+		</div>
+	</div>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script>
+	$(document).ready(function(){
+	    $("button").click(function(){
+	    	var urlData = "https://znrd2tniy1.execute-api.us-west-2.amazonaws.com/prod/getPlayers";
+	    	var photoURL = document.getElementById("photoURL").value;
+	    	var json = {key1:photoURL}
+	        $.ajax(urlData, {
+			    'data': JSON.stringify(json),
+			    'type': 'POST',
+			    'processData': false,
+			    'contentType': 'application/json',
+			    success: function (data) {
+			    	//alert(data.a);
+			    	debugger
+			    	var players = JSON.parse(data);
+			    	var urlImg;
+			    	for (var i = 0; i < players.length; ++i) {
+			    		document.getElementById("resultPhoto" + (i)).src = players[i].photoUrl;
+			    		document.getElementById("resultName" + (i)).innerText = players[i].name;
+			    	}
+			    	// Photo to compare
+		    		document.getElementById("imgCompare").src = photoURL;
+			    }
+			});
+	    });
+	});
+	</script>
+</body>
+</html>
